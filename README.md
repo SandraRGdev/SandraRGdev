@@ -99,7 +99,11 @@ y cada vez meto más **IA** en el proceso.
 
 <br>
 
-<img src="assets/metrics.languages.svg" height="165" alt="lenguajes más usados">
+<picture>
+  <source media="(prefers-color-scheme: dark)"  srcset="assets/card-languages-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/card-languages-light.svg">
+  <img src="assets/card-languages-dark.svg" width="480" alt="lenguajes más usados">
+</picture>
 
 </div>
 

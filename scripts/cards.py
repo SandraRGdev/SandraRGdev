@@ -239,6 +239,40 @@ def render_stats(user, stats, theme):
     return frame(W, H, c, "".join(out), f"{user} GitHub statistics")
 
 
+def render_languages(langs, theme):
+    """Stacked bar plus a two-column legend of the top languages by bytes."""
+    c = THEMES[theme]
+    W, pad = 480, 22
+    total = sum(b for _, b in langs) or 1
+    rows = (len(langs) + 1) // 2
+    H = pad + 26 + 22 + 12 + rows * 22 + pad - 6
+    out = [
+        f'<text x="{pad}" y="{pad + 14}" font-size="15" font-weight="700" '
+        f'fill="{c["title"]}">Lenguajes más usados</text>',
+        f'<line x1="{pad}" y1="{pad + 26}" x2="{W - pad}" y2="{pad + 26}" '
+        f'stroke="{c["border"]}"/>',
+        f'<clipPath id="bar"><rect x="{pad}" y="{pad + 40}" width="{W - 2 * pad}" '
+        f'height="10" rx="5"/></clipPath><g clip-path="url(#bar)">',
+    ]
+    x = pad
+    for name, b in langs:
+        w = (W - 2 * pad) * b / total
+        out.append(f'<rect x="{x:.1f}" y="{pad + 40}" width="{w + .5:.1f}" height="10" '
+                   f'fill="{LANG_COLOR.get(name, c["muted"])}"/>')
+        x += w
+    out.append("</g>")
+    top = pad + 40 + 10 + 24
+    col_w = (W - 2 * pad) / 2
+    for i, (name, b) in enumerate(langs):
+        cx = pad + (i % 2) * col_w
+        cy = top + (i // 2) * 22
+        out.append(f'<circle cx="{cx + 5:.0f}" cy="{cy - 4}" r="5" '
+                   f'fill="{LANG_COLOR.get(name, c["muted"])}"/>')
+        out.append(f'<text x="{cx + 16:.0f}" y="{cy}" font-size="12" fill="{c["text"]}">'
+                   f'{esc(name)} <tspan fill="{c["muted"]}">{100 * b / total:.1f}%</tspan></text>')
+    return frame(W, H, c, "".join(out), "most used languages")
+
+
 def render_repo(repo, theme):
     c = THEMES[theme]
     W, H = 420, 132
@@ -325,6 +359,19 @@ def main(argv=None):
         dest = args.out / f"card-stats-{theme}.svg"
         dest.write_text(render_stats(args.user, tiles, theme), encoding="utf-8")
     print(f"wrote card-stats-*.svg  ({len(tiles)} tiles)")
+
+    # Language bytes summed over owned repos; plain REST, so the built-in
+    # GITHUB_TOKEN is enough (no PAT needed, unlike lowlighter/metrics).
+    lang_bytes: dict[str, int] = {}
+    for r in owned:
+        for name, b in rest(f"/repos/{r['full_name']}/languages", token).items():
+            lang_bytes[name] = lang_bytes.get(name, 0) + b
+    top_langs = sorted(lang_bytes.items(), key=lambda kv: -kv[1])[:8]
+    if top_langs:
+        for theme in ("dark", "light"):
+            dest = args.out / f"card-languages-{theme}.svg"
+            dest.write_text(render_languages(top_langs, theme), encoding="utf-8")
+        print(f"wrote card-languages-*.svg  ({len(top_langs)} languages)")
 
     if not args.projects.exists():
         print(f"no {args.projects}, skipping repo cards")
