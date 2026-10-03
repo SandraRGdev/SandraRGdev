@@ -1,0 +1,13 @@
+{
+  "title": "Skill Radar",
+  "_comment": "Self-rated, 0-100. Edit these and the Charts workflow redraws the radar.",
+  "axes": [
+    { "label": "Front-End",          "value": 90 },
+    { "label": "UX/UI · Figma",      "value": 85 },
+    { "label": "React / Astro",      "value": 80 },
+    { "label": "WordPress / CMS",    "value": 88 },
+    { "label": "Agentes IA",         "value": 82 },
+    { "label": "Automatización",     "value": 80 },
+    { "label": "Back-End / APIs",    "value": 70 }
+  ]
+}
