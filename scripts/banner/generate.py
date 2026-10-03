@@ -24,7 +24,7 @@ LOGOS = Path(__file__).resolve().parent / "logos"
 DATA = Path(__file__).resolve().parent / "data"
 
 W, H = 1180, 610
-LOOP_SECONDS = 14.2
+LOOP_SECONDS = 9.5
 INTRO_SECONDS = 3.2
 TRAVELLER_COUNT = 900
 SEED = 314159
@@ -85,9 +85,9 @@ def make_logos() -> dict[str, Image.Image]:
     atom = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     for angle in (0, 60, 120):
         ring = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-        ImageDraw.Draw(ring).ellipse((30, 140, 370, 260), outline="black", width=26)
+        ImageDraw.Draw(ring).ellipse((14, 132, 386, 268), outline="black", width=16)
         atom.alpha_composite(ring.rotate(angle, resample=Image.Resampling.BICUBIC))
-    ImageDraw.Draw(atom).ellipse((168, 168, 232, 232), fill="black")
+    ImageDraw.Draw(atom).ellipse((176, 176, 224, 224), fill="black")
     logos["atom"] = atom
 
     # </> mark built from broad, rounded strokes.
@@ -262,9 +262,9 @@ def render_svg(
     code = transport(atom, logo_points["code"][:n])
     ai = transport(code, logo_points["ai"][:n])
 
-    # Explicit uneven phase boundaries: 3.0 portrait, 2.0 per logo,
-    # and four 1.3 transitions = 14.2 seconds.
-    times = [0, 3.0, 4.3, 6.3, 7.6, 9.6, 10.9, 12.9, 14.2]
+    # Explicit uneven phase boundaries: 2.5 portrait, 1.0 per logo,
+    # and four 1.0 transitions = 9.5 seconds.
+    times = [0, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]
     key_times = ";".join(num(v / LOOP_SECONDS) for v in times)
     # Returning each traveller to its exact starting portrait coordinate keeps
     # the repeat boundary seamless. All logo-to-logo morphs use optimal transport.
